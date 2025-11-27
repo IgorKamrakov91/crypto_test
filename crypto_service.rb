@@ -8,18 +8,16 @@ class CryptoBalanceFetcher
 
   def initialize(rpc_url: DEFAULT_RPC_URL)
     @rpc_url = rpc_url.to_s.strip
-    puts "CryptoBalanceFetcher initialized with RPC URL: '#{@rpc_url}'"
   end
 
   def call(wallet_address)
     raise ArgumentError, "Invalid wallet address: #{wallet_address}" unless Eth::Address.new(wallet_address).valid?
 
-    # Instantiate client here to avoid potential threading/state issues
     client = if @rpc_url.match?(/^http/i)
-              Eth::Client::Http.new(@rpc_url)
-            else
-              Eth::Client.create(@rpc_url)
-            end
+               Eth::Client::Http.new(@rpc_url)
+             else
+               Eth::Client.create(@rpc_url)
+             end
 
     balance_wei = client.get_balance(wallet_address)
     BigDecimal(balance_wei) / WEI_IN_ETH
