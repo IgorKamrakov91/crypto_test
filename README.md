@@ -32,6 +32,15 @@ The app defaults to `https://eth.llamarpc.com`, and the UI also includes Cloudfl
 
 ## Backend setup
 
+Copy the example environment file before starting local services:
+
+```bash
+cp .env.example .env
+```
+
+The checked-in example uses public development defaults. Keep any private RPC
+provider URLs or API keys in your local `.env` file only.
+
 Install Ruby dependencies:
 
 ```bash
