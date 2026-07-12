@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'rack/cors'
+require 'uri'
 require_relative 'crypto_service'
 
 # Configure CORS to allow requests from the Vue.js frontend
@@ -16,9 +17,8 @@ get '/balance/:address' do
   address = params['address']
   rpc_url = params['rpc_url']
 
-  rpc_url = nil if rpc_url && rpc_url.strip.empty?
-
   begin
+    rpc_url = normalize_rpc_url(rpc_url)
     service = rpc_url ? CryptoBalanceFetcher.new(rpc_url: rpc_url) : CryptoBalanceFetcher.new
     balance = service.call(address)
     { address: address, balance_eth: balance.to_s('F') }.to_json
@@ -28,5 +28,21 @@ get '/balance/:address' do
   rescue StandardError => e
     status 500
     { error: e.message }.to_json
+  end
+end
+
+helpers do
+  def normalize_rpc_url(value)
+    return nil unless value
+
+    url = value.strip
+    return nil if url.empty?
+
+    uri = URI.parse(url)
+    return url if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+
+    raise ArgumentError, 'RPC URL must use http or https'
+  rescue URI::InvalidURIError
+    raise ArgumentError, 'Invalid RPC URL'
   end
 end
