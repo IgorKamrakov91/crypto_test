@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 const address = ref('')
 const balance = ref(null)
@@ -14,13 +14,14 @@ const rpcOptions = [
 ]
 
 const exampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
+const normalizedAddress = computed(() => address.value.trim())
 
 const fillExample = () => {
   address.value = exampleAddress
 }
 
 const fetchBalance = async () => {
-  if (!address.value) return
+  if (!normalizedAddress.value) return
 
   loading.value = true
   error.value = null
@@ -28,7 +29,7 @@ const fetchBalance = async () => {
 
   try {
     const encodedRpc = encodeURIComponent(rpcUrl.value)
-    const response = await fetch(`http://localhost:4567/balance/${address.value}?rpc_url=${encodedRpc}`)
+    const response = await fetch(`http://localhost:4567/balance/${normalizedAddress.value}?rpc_url=${encodedRpc}`)
     const data = await response.json()
 
     if (!response.ok) {
@@ -66,7 +67,7 @@ const fetchBalance = async () => {
         @keyup.enter="fetchBalance"
         class="address-input"
       />
-      <button @click="fetchBalance" :disabled="loading">
+      <button @click="fetchBalance" :disabled="loading || !normalizedAddress">
         {{ loading ? 'Checking...' : 'Check Balance' }}
       </button>
     </div>
