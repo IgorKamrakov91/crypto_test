@@ -20,6 +20,10 @@ RSpec.describe CryptoBalanceFetcher do
 
       expect(service.instance_variable_get(:@rpc_url)).to eq(described_class::DEFAULT_RPC_URL)
     end
+
+    it 'rejects blank RPC URLs' do
+      expect { described_class.new(rpc_url: '   ') }.to raise_error(ArgumentError, 'RPC URL cannot be blank')
+    end
   end
 
   describe '#call' do

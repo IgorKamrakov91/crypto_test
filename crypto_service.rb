@@ -8,6 +8,7 @@ class CryptoBalanceFetcher
 
   def initialize(rpc_url: DEFAULT_RPC_URL)
     @rpc_url = rpc_url.to_s.strip
+    raise ArgumentError, 'RPC URL cannot be blank' if @rpc_url.empty?
   end
 
   def call(wallet_address)
