@@ -28,8 +28,9 @@ const fetchBalance = async () => {
   balance.value = null
 
   try {
-    const encodedRpc = encodeURIComponent(rpcUrl.value)
-    const response = await fetch(`http://localhost:4567/balance/${normalizedAddress.value}?rpc_url=${encodedRpc}`)
+    const encodedAddress = encodeURIComponent(normalizedAddress.value)
+    const encodedRpc = encodeURIComponent(rpcUrl.value.trim())
+    const response = await fetch(`http://localhost:4567/balance/${encodedAddress}?rpc_url=${encodedRpc}`)
     const data = await response.json()
 
     if (!response.ok) {
