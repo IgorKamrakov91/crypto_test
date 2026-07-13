@@ -39,9 +39,10 @@ helpers do
     return nil if url.empty?
 
     uri = URI.parse(url)
-    return url if uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+    raise ArgumentError, 'RPC URL must use http or https' unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+    raise ArgumentError, 'RPC URL must include a host' unless uri.host && !uri.host.empty?
 
-    raise ArgumentError, 'RPC URL must use http or https'
+    url
   rescue URI::InvalidURIError
     raise ArgumentError, 'Invalid RPC URL'
   end
