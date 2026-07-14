@@ -12,7 +12,8 @@ class CryptoBalanceFetcher
   end
 
   def call(wallet_address)
-    raise ArgumentError, "Invalid wallet address: #{wallet_address}" unless Eth::Address.new(wallet_address).valid?
+    normalized_address = wallet_address.to_s.strip
+    raise ArgumentError, "Invalid wallet address: #{wallet_address}" unless Eth::Address.new(normalized_address).valid?
 
     client = if @rpc_url.match?(/^http/i)
                Eth::Client::Http.new(@rpc_url)
@@ -20,7 +21,7 @@ class CryptoBalanceFetcher
                Eth::Client.create(@rpc_url)
              end
 
-    balance_wei = client.get_balance(wallet_address)
+    balance_wei = client.get_balance(normalized_address)
     BigDecimal(balance_wei) / WEI_IN_ETH
   end
 end

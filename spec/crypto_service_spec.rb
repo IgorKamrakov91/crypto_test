@@ -45,6 +45,18 @@ RSpec.describe CryptoBalanceFetcher do
         expect(service.call(valid_address)).to eq(expected_balance)
       end
 
+      it 'trims copied wallet addresses before validation and lookup' do
+        padded_address = "  #{valid_address}\n"
+
+        expect(Eth::Address).to receive(:new).with(valid_address).and_return(double(valid?: true))
+        expect(Eth::Client::Http).to receive(:new).with(http_rpc_url).and_return(mock_client)
+        expect(mock_client).to receive(:get_balance).with(valid_address).and_return(balance_wei)
+
+        service = described_class.new(rpc_url: http_rpc_url)
+
+        expect(service.call(padded_address)).to eq(expected_balance)
+      end
+
       it 'uses Eth::Client.create for non-HTTP RPC URLs' do
         expect(Eth::Client).to receive(:create).with(ipc_rpc_url).and_return(mock_client)
         expect(mock_client).to receive(:get_balance).with(valid_address).and_return(balance_wei)
