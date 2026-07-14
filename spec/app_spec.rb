@@ -81,4 +81,14 @@ RSpec.describe 'Balance API' do
     expect(last_response.status).to eq(400)
     expect(JSON.parse(last_response.body)).to eq('error' => 'Invalid wallet address: bad-address')
   end
+
+  it 'does not expose raw provider errors to API clients' do
+    expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
+    expect(fetcher).to receive(:call).with(address).and_raise(StandardError, 'provider token abc123 failed')
+
+    get "/balance/#{address}"
+
+    expect(last_response.status).to eq(500)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'Unable to fetch balance from the RPC provider')
+  end
 end

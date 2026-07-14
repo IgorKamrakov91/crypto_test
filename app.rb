@@ -26,8 +26,9 @@ get '/balance/:address' do
     status 400
     { error: e.message }.to_json
   rescue StandardError => e
+    warn "Balance lookup failed: #{e.class}: #{e.message}"
     status 500
-    { error: e.message }.to_json
+    { error: 'Unable to fetch balance from the RPC provider' }.to_json
   end
 end
 
