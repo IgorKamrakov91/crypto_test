@@ -13,6 +13,7 @@ const rpcOptions = [
   { name: 'Ankr', url: 'https://rpc.ankr.com/eth' }
 ]
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4567').replace(/\/$/, '')
 const exampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
 const normalizedAddress = computed(() => address.value.trim())
 
@@ -30,7 +31,7 @@ const fetchBalance = async () => {
   try {
     const encodedAddress = encodeURIComponent(normalizedAddress.value)
     const encodedRpc = encodeURIComponent(rpcUrl.value.trim())
-    const response = await fetch(`http://localhost:4567/balance/${encodedAddress}?rpc_url=${encodedRpc}`)
+    const response = await fetch(`${apiBaseUrl}/balance/${encodedAddress}?rpc_url=${encodedRpc}`)
     const data = await response.json()
 
     if (!response.ok) {

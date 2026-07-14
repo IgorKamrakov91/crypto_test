@@ -1,5 +1,18 @@
-# Vue 3 + Vite
+# Crypto Test Frontend
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Vue 3 + Vite client for checking ETH balances through the Sinatra backend.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+## Setup
+
+```bash
+npm install
+npm run dev
+```
+
+By default the client calls `http://localhost:4567`. To point it at another backend, create a local `.env` file in this directory and set:
+
+```bash
+VITE_API_BASE_URL=http://localhost:4567
+```
+
+Vite only exposes variables prefixed with `VITE_` to browser code.
