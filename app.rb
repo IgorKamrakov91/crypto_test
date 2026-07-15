@@ -3,10 +3,17 @@ require 'rack/cors'
 require 'uri'
 require_relative 'crypto_service'
 
+DEFAULT_CORS_ORIGIN = 'http://localhost:5173'.freeze
+CORS_ORIGINS = ENV.fetch('CORS_ORIGINS', DEFAULT_CORS_ORIGIN)
+                  .split(',')
+                  .map(&:strip)
+                  .reject(&:empty?)
+                  .freeze
+
 # Configure CORS to allow requests from the Vue.js frontend
 use Rack::Cors do
   allow do
-    origins 'http://localhost:5173' # Adjust this to your Vue.js development server's address and port
+    origins(*CORS_ORIGINS)
     resource '/balance/*', headers: :any, methods: [:get]
   end
 end

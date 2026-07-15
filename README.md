@@ -102,5 +102,5 @@ bundle exec rspec
 ## Development notes
 
 - The frontend currently calls `http://localhost:4567` directly.
-- CORS is configured in `app.rb` for the Vite development server at `http://localhost:5173`.
+- CORS defaults to the Vite development server at `http://localhost:5173`; set `CORS_ORIGINS` to a comma-separated list when additional frontend origins should call the API.
 - Do not commit private RPC credentials or provider API keys. Use local environment files for secrets.

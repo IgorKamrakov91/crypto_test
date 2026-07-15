@@ -27,6 +27,15 @@ RSpec.describe 'Balance API' do
     )
   end
 
+  it 'allows the configured frontend origin through CORS' do
+    expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
+
+    get "/balance/#{address}", {}, 'HTTP_ORIGIN' => 'http://localhost:5173'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.headers['access-control-allow-origin']).to eq('http://localhost:5173')
+  end
+
   it 'passes a non-empty custom RPC URL to the service' do
     rpc_url = 'https://cloudflare-eth.com'
 
