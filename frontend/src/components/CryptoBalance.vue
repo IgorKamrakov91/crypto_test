@@ -30,8 +30,15 @@ const fetchBalance = async () => {
 
   try {
     const encodedAddress = encodeURIComponent(normalizedAddress.value)
-    const encodedRpc = encodeURIComponent(rpcUrl.value.trim())
-    const response = await fetch(`${apiBaseUrl}/balance/${encodedAddress}?rpc_url=${encodedRpc}`)
+    const query = new URLSearchParams()
+    const normalizedRpcUrl = rpcUrl.value.trim()
+
+    if (normalizedRpcUrl) {
+      query.set('rpc_url', normalizedRpcUrl)
+    }
+
+    const queryString = query.toString()
+    const response = await fetch(`${apiBaseUrl}/balance/${encodedAddress}${queryString ? `?${queryString}` : ''}`)
     const data = await response.json()
 
     if (!response.ok) {
