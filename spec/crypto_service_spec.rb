@@ -21,6 +21,14 @@ RSpec.describe CryptoBalanceFetcher do
       expect(service.instance_variable_get(:@rpc_url)).to eq(described_class::DEFAULT_RPC_URL)
     end
 
+    it 'uses ETH_RPC_URL from the environment when provided' do
+      stub_const('ENV', ENV.to_hash.merge('ETH_RPC_URL' => 'https://rpc.example.test'))
+
+      service = described_class.new
+
+      expect(service.instance_variable_get(:@rpc_url)).to eq('https://rpc.example.test')
+    end
+
     it 'rejects blank RPC URLs' do
       expect { described_class.new(rpc_url: '   ') }.to raise_error(ArgumentError, 'RPC URL cannot be blank')
     end

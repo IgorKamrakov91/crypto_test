@@ -28,7 +28,7 @@ The backend validates an Ethereum wallet address, queries an Ethereum JSON-RPC e
 - Node.js and npm
 - Access to an Ethereum JSON-RPC endpoint
 
-The app defaults to `https://eth.llamarpc.com`, and the UI also includes Cloudflare and Ankr options.
+The app defaults to `https://eth.llamarpc.com`, can read a backend default from `ETH_RPC_URL`, and the UI also includes Cloudflare and Ankr options.
 
 ## Backend setup
 
@@ -103,4 +103,5 @@ bundle exec rspec
 
 - The frontend currently calls `http://localhost:4567` directly.
 - CORS defaults to the Vite development server at `http://localhost:5173`; set `CORS_ORIGINS` to a comma-separated list when additional frontend origins should call the API.
+- Set `ETH_RPC_URL` when you want the backend to use a different default RPC provider.
 - Do not commit private RPC credentials or provider API keys. Use local environment files for secrets.

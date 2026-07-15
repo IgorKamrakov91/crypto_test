@@ -6,7 +6,11 @@ class CryptoBalanceFetcher
   DEFAULT_RPC_URL = 'https://eth.llamarpc.com'.freeze
   WEI_IN_ETH = BigDecimal(10**18)
 
-  def initialize(rpc_url: DEFAULT_RPC_URL)
+  def self.default_rpc_url
+    ENV.fetch('ETH_RPC_URL', DEFAULT_RPC_URL)
+  end
+
+  def initialize(rpc_url: self.class.default_rpc_url)
     @rpc_url = rpc_url.to_s.strip
     raise ArgumentError, 'RPC URL cannot be blank' if @rpc_url.empty?
   end
