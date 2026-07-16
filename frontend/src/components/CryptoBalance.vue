@@ -16,6 +16,7 @@ const rpcOptions = [
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4567').replace(/\/$/, '')
 const exampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
 const normalizedAddress = computed(() => address.value.trim())
+const isAddressFormatValid = computed(() => /^0x[a-fA-F0-9]{40}$/.test(normalizedAddress.value))
 
 const fillExample = () => {
   address.value = exampleAddress
@@ -23,6 +24,12 @@ const fillExample = () => {
 
 const fetchBalance = async () => {
   if (!normalizedAddress.value) return
+
+  if (!isAddressFormatValid.value) {
+    balance.value = null
+    error.value = 'Enter a valid Ethereum address starting with 0x.'
+    return
+  }
 
   loading.value = true
   error.value = null
@@ -75,8 +82,10 @@ const fetchBalance = async () => {
         placeholder="Enter ETH Address" 
         @keyup.enter="fetchBalance"
         class="address-input"
+        autocomplete="off"
+        spellcheck="false"
       />
-      <button @click="fetchBalance" :disabled="loading || !normalizedAddress">
+      <button @click="fetchBalance" :disabled="loading || !normalizedAddress || !isAddressFormatValid">
         {{ loading ? 'Checking...' : 'Check Balance' }}
       </button>
     </div>
@@ -84,6 +93,10 @@ const fetchBalance = async () => {
     <div class="example-link">
       <a href="#" @click.prevent="fillExample">Use Example Address</a>
     </div>
+
+    <p v-if="normalizedAddress && !isAddressFormatValid" class="validation-hint">
+      Ethereum addresses must start with 0x and contain 40 hexadecimal characters.
+    </p>
 
     <div v-if="error" class="error">
       {{ error }}
@@ -165,6 +178,12 @@ button:disabled {
 
 .example-link a:hover {
   text-decoration: underline;
+}
+
+.validation-hint {
+  color: #b7791f;
+  font-size: 0.9em;
+  margin: 0.75em 0;
 }
 
 .error {
