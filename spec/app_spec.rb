@@ -27,6 +27,15 @@ RSpec.describe 'Balance API' do
     )
   end
 
+  it 'marks balance responses as not cacheable' do
+    expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
+
+    get "/balance/#{address}"
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.headers['cache-control']).to include('no-store')
+  end
+
   it 'allows the configured frontend origin through CORS' do
     expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
 
