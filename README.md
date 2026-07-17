@@ -74,6 +74,14 @@ Open the Vite URL shown in the terminal, usually `http://localhost:5173`.
 
 ## API usage
 
+Check that the API is running without calling an RPC provider:
+
+```bash
+curl "http://localhost:4567/health"
+```
+
+Fetch a wallet balance:
+
 ```bash
 curl "http://localhost:4567/balance/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
 ```
