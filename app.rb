@@ -19,6 +19,12 @@ use Rack::Cors do
 end
 
 # Define the API endpoint to get cryptocurrency balance
+get '/health' do
+  content_type :json
+  cache_control :no_store
+  { status: 'ok' }.to_json
+end
+
 get '/balance/:address' do
   content_type :json
   cache_control :no_store

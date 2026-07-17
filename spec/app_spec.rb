@@ -14,6 +14,14 @@ RSpec.describe 'Balance API' do
   let(:address) { '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045' }
   let(:fetcher) { instance_double(CryptoBalanceFetcher, call: BigDecimal('1.25')) }
 
+  it 'exposes a lightweight health endpoint' do
+    get '/health'
+
+    expect(last_response.status).to eq(200)
+    expect(last_response.headers['cache-control']).to include('no-store')
+    expect(JSON.parse(last_response.body)).to eq('status' => 'ok')
+  end
+
   it 'returns a JSON balance for a valid address' do
     expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
     expect(fetcher).to receive(:call).with(address).and_return(BigDecimal('1.25'))
