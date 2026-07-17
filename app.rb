@@ -22,7 +22,7 @@ end
 get '/balance/:address' do
   content_type :json
   cache_control :no_store
-  address = params['address']
+  address = params['address'].to_s.strip
   rpc_url = params['rpc_url']
 
   begin

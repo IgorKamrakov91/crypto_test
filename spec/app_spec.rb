@@ -27,6 +27,19 @@ RSpec.describe 'Balance API' do
     )
   end
 
+  it 'normalizes copied wallet addresses before lookup and response' do
+    expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
+    expect(fetcher).to receive(:call).with(address).and_return(BigDecimal('1.25'))
+
+    get "/balance/%20#{address}%0A"
+
+    expect(last_response.status).to eq(200)
+    expect(JSON.parse(last_response.body)).to eq(
+      'address' => address,
+      'balance_eth' => '1.25'
+    )
+  end
+
   it 'marks balance responses as not cacheable' do
     expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
 
