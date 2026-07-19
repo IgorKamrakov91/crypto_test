@@ -66,26 +66,28 @@ const fetchBalance = async () => {
     <h2>Check ETH Balance</h2>
     
     <div class="settings-group">
-      <label>
-        RPC Node:
-        <select v-model="rpcUrl">
+      <label for="rpc-node">RPC Node:</label>
+        <select id="rpc-node" v-model="rpcUrl">
           <option v-for="opt in rpcOptions" :key="opt.url" :value="opt.url">
             {{ opt.name }}
           </option>
         </select>
-      </label>
     </div>
 
     <div class="input-group">
+      <label class="sr-only" for="wallet-address">Ethereum wallet address</label>
       <input 
+        id="wallet-address"
         v-model="address" 
         placeholder="Enter ETH Address" 
         @keyup.enter="fetchBalance"
         class="address-input"
         autocomplete="off"
         spellcheck="false"
+        :aria-invalid="normalizedAddress && !isAddressFormatValid ? 'true' : 'false'"
+        aria-describedby="address-validation-hint"
       />
-      <button @click="fetchBalance" :disabled="loading || !normalizedAddress || !isAddressFormatValid">
+      <button type="button" @click="fetchBalance" :disabled="loading || !normalizedAddress || !isAddressFormatValid">
         {{ loading ? 'Checking...' : 'Check Balance' }}
       </button>
     </div>
@@ -94,15 +96,15 @@ const fetchBalance = async () => {
       <a href="#" @click.prevent="fillExample">Use Example Address</a>
     </div>
 
-    <p v-if="normalizedAddress && !isAddressFormatValid" class="validation-hint">
+    <p v-if="normalizedAddress && !isAddressFormatValid" id="address-validation-hint" class="validation-hint">
       Ethereum addresses must start with 0x and contain 40 hexadecimal characters.
     </p>
 
-    <div v-if="error" class="error">
+    <div v-if="error" class="error" role="alert">
       {{ error }}
     </div>
 
-    <div v-if="balance !== null" class="result">
+    <div v-if="balance !== null" class="result" role="status" aria-live="polite">
       Balance: <strong>{{ balance }} ETH</strong>
     </div>
   </div>
@@ -120,11 +122,26 @@ const fetchBalance = async () => {
   margin-bottom: 1em;
 }
 
+.settings-group label {
+  margin-right: 0.5em;
+}
+
 .settings-group select {
   padding: 0.4em;
   border-radius: 4px;
   border: 1px solid #ccc;
-  margin-left: 0.5em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .input-group {
