@@ -14,6 +14,7 @@ CORS_ORIGINS = ENV.fetch('CORS_ORIGINS', DEFAULT_CORS_ORIGIN)
 use Rack::Cors do
   allow do
     origins(*CORS_ORIGINS)
+    resource '/health', headers: :any, methods: [:get]
     resource '/balance/*', headers: :any, methods: [:get]
   end
 end
