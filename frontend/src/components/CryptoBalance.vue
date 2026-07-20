@@ -22,6 +22,14 @@ const fillExample = () => {
   address.value = exampleAddress
 }
 
+const readJsonResponse = async (response) => {
+  try {
+    return await response.json()
+  } catch {
+    return null
+  }
+}
+
 const fetchBalance = async () => {
   if (!normalizedAddress.value) return
 
@@ -46,10 +54,14 @@ const fetchBalance = async () => {
 
     const queryString = query.toString()
     const response = await fetch(`${apiBaseUrl}/balance/${encodedAddress}${queryString ? `?${queryString}` : ''}`)
-    const data = await response.json()
+    const data = await readJsonResponse(response)
 
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to fetch balance')
+      throw new Error(data?.error || 'Failed to fetch balance')
+    }
+
+    if (!data || typeof data.balance_eth === 'undefined') {
+      throw new Error('Balance API returned an invalid response')
     }
 
     balance.value = data.balance_eth
