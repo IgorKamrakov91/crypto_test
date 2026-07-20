@@ -92,6 +92,10 @@ Use a custom RPC endpoint with the `rpc_url` query parameter:
 curl "http://localhost:4567/balance/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045?rpc_url=https%3A%2F%2Fcloudflare-eth.com"
 ```
 
+Custom RPC URLs must be HTTP(S) URLs with a host and must not include embedded
+credentials. Keep provider-specific API keys in local environment files instead
+of passing them through browser-visible URLs.
+
 Successful responses look like:
 
 ```json

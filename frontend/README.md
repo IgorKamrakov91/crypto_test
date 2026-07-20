@@ -16,3 +16,7 @@ VITE_API_BASE_URL=http://localhost:4567
 ```
 
 Vite only exposes variables prefixed with `VITE_` to browser code.
+
+When adding RPC provider URLs to the UI, use public HTTP(S) endpoints only. Do
+not place provider API keys or credentials in frontend environment variables,
+because Vite embeds `VITE_` values in the browser bundle.
