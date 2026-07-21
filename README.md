@@ -9,7 +9,7 @@ The backend validates an Ethereum wallet address, queries an Ethereum JSON-RPC e
 - Sinatra API endpoint for ETH balance lookups.
 - Ethereum address validation through the `eth` Ruby gem.
 - Wei-to-ETH conversion using `BigDecimal` for precision.
-- Vue 3 frontend powered by Vite.
+- Vue 3 frontend powered by Vite with preset and custom RPC provider support.
 - RSpec coverage for the balance-fetching service.
 
 ## Project structure
@@ -41,6 +41,13 @@ cp .env.example .env
 The checked-in example uses public development defaults. Keep any private RPC
 provider URLs or API keys in your local `.env` file only.
 
+Optional environment variables:
+
+| Variable | Purpose | Default |
+| --- | --- | --- |
+| `ETH_RPC_URL` | Backend fallback RPC provider when the request omits `rpc_url`. | `https://eth.llamarpc.com` |
+| `CORS_ORIGINS` | Comma-separated browser origins allowed to call the API. | `http://localhost:5173` |
+
 Install Ruby dependencies:
 
 ```bash
@@ -71,6 +78,13 @@ npm run dev
 ```
 
 Open the Vite URL shown in the terminal, usually `http://localhost:5173`.
+
+Set `VITE_API_BASE_URL` when the Sinatra API is not running at the default
+`http://localhost:4567`:
+
+```bash
+VITE_API_BASE_URL=http://localhost:4567 npm run dev
+```
 
 ## API usage
 
