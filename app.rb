@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'rack/cors'
+require 'ipaddr'
 require 'uri'
 require_relative 'crypto_service'
 
@@ -58,9 +59,35 @@ helpers do
     raise ArgumentError, 'RPC URL must use http or https' unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
     raise ArgumentError, 'RPC URL must include a host' unless uri.host && !uri.host.empty?
     raise ArgumentError, 'RPC URL must not include credentials' if uri.userinfo
+    raise ArgumentError, 'RPC URL host is not allowed' if private_rpc_host?(uri.host)
 
     url
   rescue URI::InvalidURIError
     raise ArgumentError, 'Invalid RPC URL'
+  end
+
+  def private_rpc_host?(host)
+    normalized_host = host.downcase
+    return true if normalized_host == 'localhost' || normalized_host.end_with?('.localhost')
+
+    ip_address = IPAddr.new(normalized_host)
+    private_or_local_address?(ip_address)
+  rescue IPAddr::InvalidAddressError
+    false
+  end
+
+  def private_or_local_address?(ip_address)
+    [
+      IPAddr.new('0.0.0.0/8'),
+      IPAddr.new('10.0.0.0/8'),
+      IPAddr.new('100.64.0.0/10'),
+      IPAddr.new('127.0.0.0/8'),
+      IPAddr.new('169.254.0.0/16'),
+      IPAddr.new('172.16.0.0/12'),
+      IPAddr.new('192.168.0.0/16'),
+      IPAddr.new('::1/128'),
+      IPAddr.new('fc00::/7'),
+      IPAddr.new('fe80::/10')
+    ].any? { |range| range.include?(ip_address) }
   end
 end

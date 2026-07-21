@@ -127,6 +127,24 @@ RSpec.describe 'Balance API' do
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL must not include credentials')
   end
 
+  it 'rejects custom RPC URLs targeting localhost names' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://localhost:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'rejects custom RPC URLs targeting private IP addresses' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://192.168.1.10:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
   it 'returns a bad request for invalid wallet addresses' do
     expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
     expect(fetcher).to receive(:call).with('bad-address').and_raise(ArgumentError, 'Invalid wallet address: bad-address')
