@@ -5,7 +5,7 @@ const address = ref('')
 const balance = ref(null)
 const error = ref(null)
 const loading = ref(false)
-const rpcUrl = ref('https://eth.llamarpc.com')
+const CUSTOM_RPC_VALUE = 'custom'
 
 const rpcOptions = [
   { name: 'LlamaRPC', url: 'https://eth.llamarpc.com' },
@@ -13,10 +13,16 @@ const rpcOptions = [
   { name: 'Ankr', url: 'https://rpc.ankr.com/eth' }
 ]
 
+const rpcUrl = ref(rpcOptions[0].url)
+const customRpcUrl = ref('')
+
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4567').replace(/\/$/, '')
 const exampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
 const normalizedAddress = computed(() => address.value.trim())
 const isAddressFormatValid = computed(() => /^0x[a-fA-F0-9]{40}$/.test(normalizedAddress.value))
+const selectedRpcUrl = computed(() => (
+  rpcUrl.value === CUSTOM_RPC_VALUE ? customRpcUrl.value : rpcUrl.value
+))
 
 const fillExample = () => {
   address.value = exampleAddress
@@ -46,7 +52,7 @@ const fetchBalance = async () => {
   try {
     const encodedAddress = encodeURIComponent(normalizedAddress.value)
     const query = new URLSearchParams()
-    const normalizedRpcUrl = rpcUrl.value.trim()
+    const normalizedRpcUrl = selectedRpcUrl.value.trim()
 
     if (normalizedRpcUrl) {
       query.set('rpc_url', normalizedRpcUrl)
@@ -79,11 +85,21 @@ const fetchBalance = async () => {
     
     <div class="settings-group">
       <label for="rpc-node">RPC Node:</label>
-        <select id="rpc-node" v-model="rpcUrl">
-          <option v-for="opt in rpcOptions" :key="opt.url" :value="opt.url">
-            {{ opt.name }}
-          </option>
-        </select>
+      <select id="rpc-node" v-model="rpcUrl">
+        <option v-for="opt in rpcOptions" :key="opt.url" :value="opt.url">
+          {{ opt.name }}
+        </option>
+        <option :value="CUSTOM_RPC_VALUE">Custom RPC URL</option>
+      </select>
+      <input
+        v-if="rpcUrl === CUSTOM_RPC_VALUE"
+        v-model="customRpcUrl"
+        class="rpc-input"
+        type="url"
+        placeholder="https://rpc.example.com"
+        autocomplete="off"
+        aria-label="Custom RPC URL"
+      />
     </div>
 
     <div class="input-group">
@@ -138,10 +154,16 @@ const fetchBalance = async () => {
   margin-right: 0.5em;
 }
 
-.settings-group select {
+.settings-group select,
+.rpc-input {
   padding: 0.4em;
   border-radius: 4px;
   border: 1px solid #ccc;
+}
+
+.rpc-input {
+  margin-left: 0.5em;
+  min-width: 260px;
 }
 
 .sr-only {
