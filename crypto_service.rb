@@ -7,7 +7,8 @@ class CryptoBalanceFetcher
   WEI_IN_ETH = BigDecimal(10**18)
 
   def self.default_rpc_url
-    ENV.fetch('ETH_RPC_URL', DEFAULT_RPC_URL)
+    configured_url = ENV.fetch('ETH_RPC_URL', '').strip
+    configured_url.empty? ? DEFAULT_RPC_URL : configured_url
   end
 
   def initialize(rpc_url: self.class.default_rpc_url)
