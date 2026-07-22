@@ -77,6 +77,12 @@ helpers do
   end
 
   def private_or_local_address?(ip_address)
+    normalized_ip = if ip_address.ipv4_mapped? || ip_address.ipv4_compat?
+                      ip_address.native
+                    else
+                      ip_address
+                    end
+
     [
       IPAddr.new('0.0.0.0/8'),
       IPAddr.new('10.0.0.0/8'),
@@ -88,6 +94,6 @@ helpers do
       IPAddr.new('::1/128'),
       IPAddr.new('fc00::/7'),
       IPAddr.new('fe80::/10')
-    ].any? { |range| range.include?(ip_address) }
+    ].any? { |range| range.include?(normalized_ip) }
   end
 end
