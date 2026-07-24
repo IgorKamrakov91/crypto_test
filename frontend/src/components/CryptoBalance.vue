@@ -20,8 +20,16 @@ const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4567'
 const exampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
 const normalizedAddress = computed(() => address.value.trim())
 const isAddressFormatValid = computed(() => /^0x[a-fA-F0-9]{40}$/.test(normalizedAddress.value))
+const isCustomRpcSelected = computed(() => rpcUrl.value === CUSTOM_RPC_VALUE)
 const selectedRpcUrl = computed(() => (
-  rpcUrl.value === CUSTOM_RPC_VALUE ? customRpcUrl.value : rpcUrl.value
+  isCustomRpcSelected.value ? customRpcUrl.value : rpcUrl.value
+))
+const normalizedSelectedRpcUrl = computed(() => selectedRpcUrl.value.trim())
+const canSubmit = computed(() => (
+  !loading.value
+  && Boolean(normalizedAddress.value)
+  && isAddressFormatValid.value
+  && (!isCustomRpcSelected.value || Boolean(normalizedSelectedRpcUrl.value))
 ))
 
 const fillExample = () => {
@@ -45,6 +53,12 @@ const fetchBalance = async () => {
     return
   }
 
+  if (isCustomRpcSelected.value && !normalizedSelectedRpcUrl.value) {
+    balance.value = null
+    error.value = 'Enter a custom RPC URL or choose a preset RPC node.'
+    return
+  }
+
   loading.value = true
   error.value = null
   balance.value = null
@@ -52,10 +66,8 @@ const fetchBalance = async () => {
   try {
     const encodedAddress = encodeURIComponent(normalizedAddress.value)
     const query = new URLSearchParams()
-    const normalizedRpcUrl = selectedRpcUrl.value.trim()
-
-    if (normalizedRpcUrl) {
-      query.set('rpc_url', normalizedRpcUrl)
+    if (normalizedSelectedRpcUrl.value) {
+      query.set('rpc_url', normalizedSelectedRpcUrl.value)
     }
 
     const queryString = query.toString()
@@ -115,7 +127,7 @@ const fetchBalance = async () => {
         :aria-invalid="normalizedAddress && !isAddressFormatValid ? 'true' : 'false'"
         aria-describedby="address-validation-hint"
       />
-      <button type="button" @click="fetchBalance" :disabled="loading || !normalizedAddress || !isAddressFormatValid">
+      <button type="button" @click="fetchBalance" :disabled="!canSubmit">
         {{ loading ? 'Checking...' : 'Check Balance' }}
       </button>
     </div>
