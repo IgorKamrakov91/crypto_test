@@ -10,6 +10,22 @@ CORS_ORIGINS = ENV.fetch('CORS_ORIGINS', DEFAULT_CORS_ORIGIN)
                   .map(&:strip)
                   .reject(&:empty?)
                   .freeze
+RPC_HOST_DENYLIST = [
+  IPAddr.new('0.0.0.0/8'),
+  IPAddr.new('10.0.0.0/8'),
+  IPAddr.new('100.64.0.0/10'),
+  IPAddr.new('127.0.0.0/8'),
+  IPAddr.new('169.254.0.0/16'),
+  IPAddr.new('172.16.0.0/12'),
+  IPAddr.new('192.168.0.0/16'),
+  IPAddr.new('224.0.0.0/4'),
+  IPAddr.new('240.0.0.0/4'),
+  IPAddr.new('::/128'),
+  IPAddr.new('::1/128'),
+  IPAddr.new('fc00::/7'),
+  IPAddr.new('fe80::/10'),
+  IPAddr.new('ff00::/8')
+].freeze
 
 # Configure CORS to allow requests from the Vue.js frontend
 use Rack::Cors do
@@ -83,17 +99,6 @@ helpers do
                       ip_address
                     end
 
-    [
-      IPAddr.new('0.0.0.0/8'),
-      IPAddr.new('10.0.0.0/8'),
-      IPAddr.new('100.64.0.0/10'),
-      IPAddr.new('127.0.0.0/8'),
-      IPAddr.new('169.254.0.0/16'),
-      IPAddr.new('172.16.0.0/12'),
-      IPAddr.new('192.168.0.0/16'),
-      IPAddr.new('::1/128'),
-      IPAddr.new('fc00::/7'),
-      IPAddr.new('fe80::/10')
-    ].any? { |range| range.include?(normalized_ip) }
+    RPC_HOST_DENYLIST.any? { |range| range.include?(normalized_ip) }
   end
 end
