@@ -83,6 +83,16 @@ RSpec.describe 'Balance API' do
     expect(last_response.status).to eq(200)
   end
 
+  it 'trims copied custom RPC URLs before passing them to the service' do
+    rpc_url = 'https://cloudflare-eth.com'
+
+    expect(CryptoBalanceFetcher).to receive(:new).with(rpc_url: rpc_url).and_return(fetcher)
+
+    get "/balance/#{address}", rpc_url: "  #{rpc_url}\n"
+
+    expect(last_response.status).to eq(200)
+  end
+
   it 'ignores blank custom RPC URLs' do
     expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
 
@@ -131,6 +141,15 @@ RSpec.describe 'Balance API' do
     expect(CryptoBalanceFetcher).not_to receive(:new)
 
     get "/balance/#{address}", rpc_url: 'http://localhost:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'rejects custom RPC URLs targeting localhost subdomains' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://api.localhost:8545'
 
     expect(last_response.status).to eq(400)
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
