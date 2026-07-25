@@ -45,7 +45,11 @@ const readJsonResponse = async (response) => {
 }
 
 const fetchBalance = async () => {
-  if (!normalizedAddress.value) return
+  if (!normalizedAddress.value) {
+    balance.value = null
+    error.value = null
+    return
+  }
 
   if (!isAddressFormatValid.value) {
     balance.value = null
