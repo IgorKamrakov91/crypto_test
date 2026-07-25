@@ -126,9 +126,17 @@ Successful responses look like:
 bundle exec rspec
 ```
 
+Build the frontend production bundle:
+
+```bash
+cd frontend
+npm run build
+```
+
 ## Development notes
 
-- The frontend currently calls `http://localhost:4567` directly.
+- The frontend defaults to `http://localhost:4567`; set `VITE_API_BASE_URL`
+  when the API is served from a different origin or port.
 - CORS defaults to the Vite development server at `http://localhost:5173`; set `CORS_ORIGINS` to a comma-separated list when additional frontend origins should call the API.
 - Set `ETH_RPC_URL` when you want the backend to use a different default RPC provider.
 - Do not commit private RPC credentials or provider API keys. Use local environment files for secrets.
