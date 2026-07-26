@@ -85,11 +85,17 @@ helpers do
   def private_rpc_host?(host)
     normalized_host = host.downcase
     return true if normalized_host == 'localhost' || normalized_host.end_with?('.localhost')
+    return true if ambiguous_ipv4_host?(normalized_host)
 
     ip_address = IPAddr.new(normalized_host)
     private_or_local_address?(ip_address)
   rescue IPAddr::InvalidAddressError
     false
+  end
+
+  def ambiguous_ipv4_host?(host)
+    host.match?(/\A(?:0x[0-9a-f]+|\d+)\z/i) ||
+      host.match?(/\A(?:0[0-9]+\.){3}0[0-9]+\z/)
   end
 
   def private_or_local_address?(ip_address)
