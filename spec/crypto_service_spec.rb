@@ -81,6 +81,17 @@ RSpec.describe CryptoBalanceFetcher do
 
         expect(service.call(valid_address)).to eq(expected_balance)
       end
+
+      it 'preserves fractional ETH precision when converting from wei' do
+        balance_wei = 1_234_567_890_123_456_789
+
+        expect(Eth::Client::Http).to receive(:new).with(http_rpc_url).and_return(mock_client)
+        expect(mock_client).to receive(:get_balance).with(valid_address).and_return(balance_wei)
+
+        service = described_class.new(rpc_url: http_rpc_url)
+
+        expect(service.call(valid_address)).to eq(BigDecimal('1.234567890123456789'))
+      end
     end
 
     context 'when the wallet address is invalid' do
