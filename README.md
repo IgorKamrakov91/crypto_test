@@ -107,9 +107,9 @@ curl "http://localhost:4567/balance/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045?r
 ```
 
 Custom RPC URLs must be HTTP(S) URLs with a host, must not include embedded
-credentials, and must not target localhost, private, reserved, or multicast
-addresses. Keep provider-specific API keys in local environment files instead
-of passing them through browser-visible URLs.
+credentials, and must not target localhost, private, reserved, multicast, or
+ambiguous encoded IP addresses. Keep provider-specific API keys in local
+environment files instead of passing them through browser-visible URLs.
 
 Successful responses look like:
 
