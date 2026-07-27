@@ -25,11 +25,24 @@ const selectedRpcUrl = computed(() => (
   isCustomRpcSelected.value ? customRpcUrl.value : rpcUrl.value
 ))
 const normalizedSelectedRpcUrl = computed(() => selectedRpcUrl.value.trim())
+const isCustomRpcUrlValid = computed(() => {
+  if (!isCustomRpcSelected.value || !normalizedSelectedRpcUrl.value) {
+    return true
+  }
+
+  try {
+    const url = new URL(normalizedSelectedRpcUrl.value)
+    return ['http:', 'https:'].includes(url.protocol) && Boolean(url.hostname) && !url.username && !url.password && !url.hash
+  } catch {
+    return false
+  }
+})
 const canSubmit = computed(() => (
   !loading.value
   && Boolean(normalizedAddress.value)
   && isAddressFormatValid.value
   && (!isCustomRpcSelected.value || Boolean(normalizedSelectedRpcUrl.value))
+  && isCustomRpcUrlValid.value
 ))
 
 const fillExample = () => {
@@ -60,6 +73,12 @@ const fetchBalance = async () => {
   if (isCustomRpcSelected.value && !normalizedSelectedRpcUrl.value) {
     balance.value = null
     error.value = 'Enter a custom RPC URL or choose a preset RPC node.'
+    return
+  }
+
+  if (!isCustomRpcUrlValid.value) {
+    balance.value = null
+    error.value = 'Enter an HTTP(S) RPC URL without credentials or fragments.'
     return
   }
 
@@ -115,8 +134,14 @@ const fetchBalance = async () => {
         placeholder="https://rpc.example.com"
         autocomplete="off"
         aria-label="Custom RPC URL"
+        :aria-invalid="normalizedSelectedRpcUrl && !isCustomRpcUrlValid ? 'true' : 'false'"
+        aria-describedby="rpc-validation-hint"
       />
     </div>
+
+    <p v-if="isCustomRpcSelected && normalizedSelectedRpcUrl && !isCustomRpcUrlValid" id="rpc-validation-hint" class="validation-hint">
+      Custom RPC URLs must use HTTP(S) and cannot include credentials or fragments.
+    </p>
 
     <div class="input-group">
       <label class="sr-only" for="wallet-address">Ethereum wallet address</label>
