@@ -137,6 +137,15 @@ RSpec.describe 'Balance API' do
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL must not include credentials')
   end
 
+  it 'rejects custom RPC URLs containing browser-only fragments' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'https://example.com/rpc#provider-token'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL must not include fragments')
+  end
+
   it 'rejects custom RPC URLs targeting localhost names' do
     expect(CryptoBalanceFetcher).not_to receive(:new)
 

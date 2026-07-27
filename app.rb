@@ -75,6 +75,7 @@ helpers do
     raise ArgumentError, 'RPC URL must use http or https' unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
     raise ArgumentError, 'RPC URL must include a host' unless uri.host && !uri.host.empty?
     raise ArgumentError, 'RPC URL must not include credentials' if uri.userinfo
+    raise ArgumentError, 'RPC URL must not include fragments' if uri.fragment
     raise ArgumentError, 'RPC URL host is not allowed' if private_rpc_host?(uri.host)
 
     url
