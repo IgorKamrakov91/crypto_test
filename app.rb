@@ -95,8 +95,11 @@ helpers do
   end
 
   def ambiguous_ipv4_host?(host)
-    host.match?(/\A(?:0x[0-9a-f]+|\d+)\z/i) ||
-      host.match?(/\A(?:0[0-9]+\.){3}0[0-9]+\z/)
+    return true if host.match?(/\A(?:0x[0-9a-f]+|\d+)\z/i)
+    return false unless host.match?(/\A(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*\z/i)
+
+    parts = host.split('.')
+    parts.length != 4 || parts.any? { |part| part.match?(/\A0x/i) || (part.length > 1 && part.start_with?('0')) }
   end
 
   def private_or_local_address?(ip_address)

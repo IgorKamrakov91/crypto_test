@@ -182,6 +182,24 @@ RSpec.describe 'Balance API' do
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
   end
 
+  it 'rejects custom RPC URLs using shortened IPv4 loopback hosts' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://127.1:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'rejects custom RPC URLs using octal-like dotted IPv4 hosts' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://0177.0000.0000.0001:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
   it 'rejects custom RPC URLs using hexadecimal IPv4 loopback hosts' do
     expect(CryptoBalanceFetcher).not_to receive(:new)
 
