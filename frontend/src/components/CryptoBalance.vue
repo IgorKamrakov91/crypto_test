@@ -1,5 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue'
+import {
+  hasValidEthereumAddressFormat,
+  hasValidRpcUrlFormat,
+  normalizeInput
+} from '../lib/validation.js'
 
 const address = ref('')
 const balance = ref(null)
@@ -18,25 +23,16 @@ const customRpcUrl = ref('')
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4567').replace(/\/$/, '')
 const exampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045'
-const normalizedAddress = computed(() => address.value.trim())
-const isAddressFormatValid = computed(() => /^0x[a-fA-F0-9]{40}$/.test(normalizedAddress.value))
+const normalizedAddress = computed(() => normalizeInput(address.value))
+const isAddressFormatValid = computed(() => hasValidEthereumAddressFormat(normalizedAddress.value))
 const isCustomRpcSelected = computed(() => rpcUrl.value === CUSTOM_RPC_VALUE)
 const selectedRpcUrl = computed(() => (
   isCustomRpcSelected.value ? customRpcUrl.value : rpcUrl.value
 ))
-const normalizedSelectedRpcUrl = computed(() => selectedRpcUrl.value.trim())
-const isCustomRpcUrlValid = computed(() => {
-  if (!isCustomRpcSelected.value || !normalizedSelectedRpcUrl.value) {
-    return true
-  }
-
-  try {
-    const url = new URL(normalizedSelectedRpcUrl.value)
-    return ['http:', 'https:'].includes(url.protocol) && Boolean(url.hostname) && !url.username && !url.password && !url.hash
-  } catch {
-    return false
-  }
-})
+const normalizedSelectedRpcUrl = computed(() => normalizeInput(selectedRpcUrl.value))
+const isCustomRpcUrlValid = computed(() => (
+  !isCustomRpcSelected.value || !normalizedSelectedRpcUrl.value || hasValidRpcUrlFormat(normalizedSelectedRpcUrl.value)
+))
 const canSubmit = computed(() => (
   !loading.value
   && Boolean(normalizedAddress.value)
