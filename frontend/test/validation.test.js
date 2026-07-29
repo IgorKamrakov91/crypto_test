@@ -4,6 +4,7 @@ import { describe, it } from 'node:test'
 import {
   hasValidEthereumAddressFormat,
   hasValidRpcUrlFormat,
+  isAllowedRpcHost,
   normalizeInput
 } from '../src/lib/validation.js'
 
@@ -22,9 +23,9 @@ describe('validation helpers', () => {
     assert.equal(hasValidEthereumAddressFormat(''), false)
   })
 
-  it('accepts HTTP(S) RPC URLs with hosts', () => {
+  it('accepts HTTP(S) RPC URLs with public hosts', () => {
     assert.equal(hasValidRpcUrlFormat('https://eth.llamarpc.com'), true)
-    assert.equal(hasValidRpcUrlFormat(' http://localhost:8545 '), true)
+    assert.equal(hasValidRpcUrlFormat(' https://rpc.ankr.com/eth '), true)
   })
 
   it('rejects RPC URLs with unsafe browser-visible components', () => {
@@ -33,5 +34,23 @@ describe('validation helpers', () => {
     assert.equal(hasValidRpcUrlFormat('https://token:secret@example.com'), false)
     assert.equal(hasValidRpcUrlFormat('https://example.com/rpc#provider-token'), false)
     assert.equal(hasValidRpcUrlFormat('not a url'), false)
+  })
+
+  it('rejects localhost and private network RPC hosts', () => {
+    assert.equal(hasValidRpcUrlFormat('http://localhost:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://api.localhost:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://10.0.0.5:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://172.20.0.5:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://192.168.1.10:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://127.1:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://[::1]:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://[fc00::1]:8545'), false)
+  })
+
+  it('classifies RPC host safety consistently', () => {
+    assert.equal(isAllowedRpcHost('eth.llamarpc.com'), true)
+    assert.equal(isAllowedRpcHost('localhost'), false)
+    assert.equal(isAllowedRpcHost('100.64.10.1'), false)
+    assert.equal(isAllowedRpcHost('[fe80::1]'), false)
   })
 })
