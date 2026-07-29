@@ -19,4 +19,6 @@ Vite only exposes variables prefixed with `VITE_` to browser code.
 
 When adding RPC provider URLs to the UI, use public HTTP(S) endpoints only. Do
 not place provider API keys or credentials in frontend environment variables,
-because Vite embeds `VITE_` values in the browser bundle.
+because Vite embeds `VITE_` values in the browser bundle. Custom RPC URLs are
+also checked in the browser before submission and should not point at localhost
+or private network hosts; the backend enforces the same SSRF guardrails.

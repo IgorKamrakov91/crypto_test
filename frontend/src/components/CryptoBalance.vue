@@ -74,7 +74,7 @@ const fetchBalance = async () => {
 
   if (!isCustomRpcUrlValid.value) {
     balance.value = null
-    error.value = 'Enter an HTTP(S) RPC URL without credentials or fragments.'
+    error.value = 'Enter a public HTTP(S) RPC URL without credentials, fragments, or private network hosts.'
     return
   }
 
@@ -136,7 +136,7 @@ const fetchBalance = async () => {
     </div>
 
     <p v-if="isCustomRpcSelected && normalizedSelectedRpcUrl && !isCustomRpcUrlValid" id="rpc-validation-hint" class="validation-hint">
-      Custom RPC URLs must use HTTP(S) and cannot include credentials or fragments.
+      Custom RPC URLs must use public HTTP(S) endpoints and cannot include credentials, fragments, localhost, or private network hosts.
     </p>
 
     <div class="input-group">
