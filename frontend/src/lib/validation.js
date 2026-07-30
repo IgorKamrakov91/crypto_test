@@ -2,16 +2,7 @@ export const hasValidEthereumAddressFormat = (value) => /^0x[a-fA-F0-9]{40}$/.te
 
 export const normalizeInput = (value) => value.trim()
 
-const privateIpv4Ranges = [
-  [0, 0],
-  [10, 10],
-  [100, 100],
-  [127, 127],
-  [169, 169],
-  [172, 172],
-  [192, 192],
-  [224, 255]
-]
+const blockedIpv4FirstOctetRanges = [[0, 0], [10, 10], [127, 127], [224, 255]]
 
 const parseIpv4Address = (host) => {
   const parts = host.split('.')
@@ -43,7 +34,7 @@ const isPrivateIpv4Address = (host) => {
     return second === 168
   }
 
-  return privateIpv4Ranges.some(([start, end]) => first >= start && first <= end)
+  return blockedIpv4FirstOctetRanges.some(([start, end]) => first >= start && first <= end)
 }
 
 const isPrivateIpv6Address = (host) => {

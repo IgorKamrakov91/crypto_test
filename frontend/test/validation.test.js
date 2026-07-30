@@ -47,6 +47,13 @@ describe('validation helpers', () => {
     assert.equal(hasValidRpcUrlFormat('http://[fc00::1]:8545'), false)
   })
 
+  it('allows public IPv4 hosts near private range boundaries', () => {
+    assert.equal(hasValidRpcUrlFormat('https://100.128.0.1'), true)
+    assert.equal(hasValidRpcUrlFormat('https://169.255.1.1'), true)
+    assert.equal(hasValidRpcUrlFormat('https://172.32.0.1'), true)
+    assert.equal(hasValidRpcUrlFormat('https://192.0.3.10'), true)
+  })
+
   it('classifies RPC host safety consistently', () => {
     assert.equal(isAllowedRpcHost('eth.llamarpc.com'), true)
     assert.equal(isAllowedRpcHost('localhost'), false)
