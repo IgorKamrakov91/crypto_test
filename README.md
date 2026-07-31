@@ -54,13 +54,19 @@ Install Ruby dependencies:
 bundle install
 ```
 
-Start the Sinatra API:
+Start the Sinatra API directly:
 
 ```bash
 ruby app.rb
 ```
 
-By default Sinatra listens on `http://localhost:4567`.
+Or run it through Rack/Puma using the checked-in Rack config:
+
+```bash
+bundle exec rackup
+```
+
+By default Sinatra listens on `http://localhost:4567`; Rack defaults to `http://localhost:9292` unless a port is specified.
 
 ## Frontend setup
 
