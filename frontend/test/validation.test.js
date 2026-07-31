@@ -36,15 +36,20 @@ describe('validation helpers', () => {
     assert.equal(hasValidRpcUrlFormat('not a url'), false)
   })
 
-  it('rejects localhost and private network RPC hosts', () => {
+  it('rejects localhost, private, and reserved RPC hosts', () => {
     assert.equal(hasValidRpcUrlFormat('http://localhost:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://api.localhost:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://10.0.0.5:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://172.20.0.5:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://192.168.1.10:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://127.1:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://192.0.2.10:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://198.18.0.1:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://198.51.100.10:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://203.0.113.5:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://[::1]:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://[fc00::1]:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://[2001:db8::1]:8545'), false)
   })
 
   it('allows public IPv4 hosts near private range boundaries', () => {

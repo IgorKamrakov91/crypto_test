@@ -31,7 +31,13 @@ const isPrivateIpv4Address = (host) => {
     return second >= 16 && second <= 31
   }
   if (first === 192) {
-    return second === 168
+    return second === 168 || (second === 0 && (octets[2] === 0 || octets[2] === 2))
+  }
+  if (first === 198) {
+    return (second === 18 || second === 19) || (second === 51 && octets[2] === 100)
+  }
+  if (first === 203) {
+    return second === 0 && octets[2] === 113
   }
 
   return blockedIpv4FirstOctetRanges.some(([start, end]) => first >= start && first <= end)
@@ -41,6 +47,10 @@ const isPrivateIpv6Address = (host) => {
   const ipv6Host = host.replace(/^\[|\]$/g, '').toLowerCase()
   return ipv6Host === '::'
     || ipv6Host === '::1'
+    || ipv6Host.startsWith('64:ff9b:1:')
+    || ipv6Host.startsWith('100:')
+    || ipv6Host.startsWith('2001:2:')
+    || ipv6Host.startsWith('2001:db8:')
     || ipv6Host.startsWith('fc')
     || ipv6Host.startsWith('fd')
     || ipv6Host.startsWith('fe8')
