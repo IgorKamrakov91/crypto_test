@@ -164,6 +164,24 @@ RSpec.describe 'Balance API' do
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
   end
 
+  it 'rejects custom RPC URLs using trailing-dot localhost names' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://localhost.:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'rejects custom RPC URLs using trailing-dot localhost subdomains' do
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'http://api.localhost.:8545'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
   it 'rejects custom RPC URLs targeting private IP addresses' do
     expect(CryptoBalanceFetcher).not_to receive(:new)
 

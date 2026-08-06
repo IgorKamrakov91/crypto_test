@@ -62,7 +62,8 @@ const isPrivateIpv6Address = (host) => {
 }
 
 export const isAllowedRpcHost = (host) => {
-  const normalizedHost = host.toLowerCase()
+  const lowerHost = host.toLowerCase()
+  const normalizedHost = lowerHost.includes(':') ? lowerHost : lowerHost.replace(/\.$/, '')
 
   if (normalizedHost === 'localhost' || normalizedHost.endsWith('.localhost')) {
     return false

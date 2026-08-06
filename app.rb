@@ -93,7 +93,7 @@ helpers do
   end
 
   def private_rpc_host?(host)
-    normalized_host = host.downcase
+    normalized_host = normalize_dns_host(host)
     return true if normalized_host == 'localhost' || normalized_host.end_with?('.localhost')
     return true if ambiguous_ipv4_host?(normalized_host)
 
@@ -101,6 +101,13 @@ helpers do
     private_or_local_address?(ip_address)
   rescue IPAddr::InvalidAddressError
     false
+  end
+
+  def normalize_dns_host(host)
+    normalized_host = host.downcase
+    return normalized_host if normalized_host.include?(':')
+
+    normalized_host.delete_suffix('.')
   end
 
   def ambiguous_ipv4_host?(host)

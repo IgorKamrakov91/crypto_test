@@ -39,6 +39,8 @@ describe('validation helpers', () => {
   it('rejects localhost, private, and reserved RPC hosts', () => {
     assert.equal(hasValidRpcUrlFormat('http://localhost:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://api.localhost:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://localhost.:8545'), false)
+    assert.equal(hasValidRpcUrlFormat('http://api.localhost.:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://10.0.0.5:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://172.20.0.5:8545'), false)
     assert.equal(hasValidRpcUrlFormat('http://192.168.1.10:8545'), false)
@@ -62,6 +64,7 @@ describe('validation helpers', () => {
   it('classifies RPC host safety consistently', () => {
     assert.equal(isAllowedRpcHost('eth.llamarpc.com'), true)
     assert.equal(isAllowedRpcHost('localhost'), false)
+    assert.equal(isAllowedRpcHost('localhost.'), false)
     assert.equal(isAllowedRpcHost('100.64.10.1'), false)
     assert.equal(isAllowedRpcHost('[fe80::1]'), false)
   })
