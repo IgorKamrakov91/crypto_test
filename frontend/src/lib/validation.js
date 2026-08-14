@@ -14,6 +14,29 @@ const parseIpv4Address = (host) => {
   return octets.every((octet) => octet >= 0 && octet <= 255) ? octets : null
 }
 
+const extractRawUrlHost = (value) => {
+  const authority = value.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').split(/[/?#]/, 1)[0]
+  const host = authority.replace(/^[^@]*@/, '')
+
+  if (host.startsWith('[')) {
+    return host.slice(1, host.indexOf(']'))
+  }
+
+  return host.split(':', 1)[0]
+}
+
+const hasAmbiguousIpv4Host = (host) => {
+  if (/^(?:0x[0-9a-f]+|\d+)$/i.test(host)) {
+    return true
+  }
+  if (!/^(?:0x[0-9a-f]+|\d+)(?:\.(?:0x[0-9a-f]+|\d+))*$/i.test(host)) {
+    return false
+  }
+
+  const parts = host.split('.')
+  return parts.length !== 4 || parts.some((part) => /^0x/i.test(part) || (part.length > 1 && part.startsWith('0')))
+}
+
 const isPrivateIpv4Address = (host) => {
   const octets = parseIpv4Address(host)
   if (!octets) {
@@ -84,6 +107,10 @@ export const hasValidRpcUrlFormat = (value) => {
   }
 
   try {
+    if (hasAmbiguousIpv4Host(extractRawUrlHost(normalizedValue).toLowerCase())) {
+      return false
+    }
+
     const url = new URL(normalizedValue)
     return ['http:', 'https:'].includes(url.protocol)
       && Boolean(url.hostname)
