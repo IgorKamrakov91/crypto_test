@@ -132,6 +132,13 @@ Successful responses look like:
 bundle exec rspec
 ```
 
+Run the frontend validation tests:
+
+```bash
+cd frontend
+npm test
+```
+
 Build the frontend production bundle:
 
 ```bash
