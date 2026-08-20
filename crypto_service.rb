@@ -33,6 +33,6 @@ class CryptoBalanceFetcher
   end
 
   def http_rpc_url?
-    @rpc_url.match?(/^http/i)
+    @rpc_url.match?(%r{\Ahttps?://}i)
   end
 end
