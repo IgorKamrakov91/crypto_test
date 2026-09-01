@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'rack/cors'
 require 'ipaddr'
+require 'resolv'
+require 'timeout'
 require 'uri'
 require_relative 'crypto_service'
 
@@ -100,6 +102,16 @@ helpers do
     ip_address = IPAddr.new(normalized_host)
     private_or_local_address?(ip_address)
   rescue IPAddr::InvalidAddressError
+    resolved_private_rpc_host?(normalized_host)
+  end
+
+  def resolved_private_rpc_host?(host)
+    addresses = Timeout.timeout(2) { Resolv.getaddresses(host) }
+
+    addresses.any? do |address|
+      private_or_local_address?(IPAddr.new(address))
+    end
+  rescue Resolv::ResolvError, IPAddr::InvalidAddressError, Timeout::Error
     false
   end
 

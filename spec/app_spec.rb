@@ -75,6 +75,7 @@ RSpec.describe 'Balance API' do
 
   it 'passes a non-empty custom RPC URL to the service' do
     rpc_url = 'https://cloudflare-eth.com'
+    allow(Resolv).to receive(:getaddresses).with('cloudflare-eth.com').and_return(['1.1.1.1'])
 
     expect(CryptoBalanceFetcher).to receive(:new).with(rpc_url: rpc_url).and_return(fetcher)
 
@@ -85,6 +86,7 @@ RSpec.describe 'Balance API' do
 
   it 'trims copied custom RPC URLs before passing them to the service' do
     rpc_url = 'https://cloudflare-eth.com'
+    allow(Resolv).to receive(:getaddresses).with('cloudflare-eth.com').and_return(['1.1.1.1'])
 
     expect(CryptoBalanceFetcher).to receive(:new).with(rpc_url: rpc_url).and_return(fetcher)
 
@@ -189,6 +191,26 @@ RSpec.describe 'Balance API' do
 
     expect(last_response.status).to eq(400)
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'rejects custom RPC URLs whose hostnames resolve to private IP addresses' do
+    expect(Resolv).to receive(:getaddresses).with('internal.example.test').and_return(['10.0.0.15'])
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'https://internal.example.test/rpc'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'allows custom RPC hostnames that resolve to public IP addresses' do
+    rpc_url = 'https://rpc.example.test'
+    expect(Resolv).to receive(:getaddresses).with('rpc.example.test').and_return(['1.1.1.1'])
+    expect(CryptoBalanceFetcher).to receive(:new).with(rpc_url: rpc_url).and_return(fetcher)
+
+    get "/balance/#{address}", rpc_url: rpc_url
+
+    expect(last_response.status).to eq(200)
   end
 
   it 'rejects custom RPC URLs using integer-encoded IPv4 loopback hosts' do
