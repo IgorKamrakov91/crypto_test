@@ -112,7 +112,10 @@ helpers do
       private_or_local_address?(IPAddr.new(address))
     end
   rescue Resolv::ResolvError, IPAddr::InvalidAddressError, Timeout::Error
-    false
+    # A hostname whose addresses cannot be checked must not be passed to the
+    # HTTP client. Failing closed prevents DNS failures from bypassing the
+    # private-network guard.
+    true
   end
 
   def normalize_dns_host(host)
