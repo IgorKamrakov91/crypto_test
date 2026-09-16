@@ -203,6 +203,26 @@ RSpec.describe 'Balance API' do
     expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
   end
 
+  it 'rejects custom RPC URLs whose hostnames cannot be resolved' do
+    expect(Resolv).to receive(:getaddresses).with('unresolvable.example.test').and_raise(Resolv::ResolvError)
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'https://unresolvable.example.test/rpc'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
+  it 'rejects custom RPC URLs whose DNS lookup times out' do
+    expect(Resolv).to receive(:getaddresses).with('slow.example.test').and_raise(Timeout::Error)
+    expect(CryptoBalanceFetcher).not_to receive(:new)
+
+    get "/balance/#{address}", rpc_url: 'https://slow.example.test/rpc'
+
+    expect(last_response.status).to eq(400)
+    expect(JSON.parse(last_response.body)).to eq('error' => 'RPC URL host is not allowed')
+  end
+
   it 'allows custom RPC hostnames that resolve to public IP addresses' do
     rpc_url = 'https://rpc.example.test'
     expect(Resolv).to receive(:getaddresses).with('rpc.example.test').and_return(['1.1.1.1'])
