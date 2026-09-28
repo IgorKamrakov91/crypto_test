@@ -108,6 +108,10 @@ helpers do
   def resolved_private_rpc_host?(host)
     addresses = Timeout.timeout(2) { Resolv.getaddresses(host) }
 
+    # An empty answer cannot establish that the eventual HTTP connection will
+    # stay off private networks, so treat it like a failed lookup.
+    return true if addresses.empty?
+
     addresses.any? do |address|
       private_or_local_address?(IPAddr.new(address))
     end
