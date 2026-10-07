@@ -338,7 +338,7 @@ RSpec.describe 'Balance API' do
     expect(CryptoBalanceFetcher).to receive(:new).and_return(fetcher)
     expect(fetcher).to receive(:call).with(address).and_raise(StandardError, 'provider token abc123 failed')
 
-    get "/balance/#{address}"
+    expect { get "/balance/#{address}" }.to output("Balance lookup failed: StandardError\n").to_stderr
 
     expect(last_response.status).to eq(500)
     expect(JSON.parse(last_response.body)).to eq('error' => 'Unable to fetch balance from the RPC provider')
